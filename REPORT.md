@@ -12,3 +12,17 @@ A git tag is just a name attached to one specific commit, and unlike a branch it
 **Q3: What is the purpose of a GitHub Release? Why attach binaries?**
 
 A GitHub Release takes one of your tags and turns it into something a normal user can actually download and use, instead of them having to clone your whole repo and build it themselves. It comes with a title, description, and you can attach files to it. Attaching the compiled binary (bin/client in my case) matters because it means someone without a C compiler or any of my Makefile setup can just download the file and run it directly - it's the difference between giving someone your source code versus giving them working software.
+
+## Feature 3: Creating and using Static Library
+
+**Q1: Compare the Makefile from Part 2 and Part 3. What are the key differences?**
+
+In Part 2's Makefile, the target executable depended directly on all three object files and linked them together in one gcc command. In Part 3 I added a new rule that builds lib/libmyutils.a from just the two utility object files (mystrfunctions.o and myfilefunctions.o) using ar rcs, and I introduced an AR variable for that. The executable's rule changed too - now client_static only depends on main.o and the library itself, and instead of listing object files to link, it uses -L../lib to tell the linker where to find the library and -lmyutils to actually link against it. So instead of one flat linking step, there's now a separate library-building step in between.
+
+**Q2: What is the purpose of the ar command? Why is ranlib often used immediately after it?**
+
+ar is used to create and manage archive files, which in this context means bundling multiple .o files into a single static library (.a file). It basically packs the object files together into one archive. ranlib is used to generate or update the index inside that archive - the index maps which symbols (function names) live in which object file, so the linker can quickly find what it needs instead of scanning through every object file in the archive one at a time. I actually used the -s flag with ar (ar rcs) instead of running ranlib separately, since -s tells ar to generate that same index itself as part of the same command.
+
+**Q3: When you run nm on client_static, are the symbols for functions like mystrlen present? What does this tell you?**
+
+Yes - running nm bin/client_static | grep mystrlen shows mystrlen listed with a T symbol type, meaning it's defined and present in the executable's actual code section. This confirms that static linking physically copies the machine code of every function it needs straight from the library into the final executable at link time. That's different from dynamic linking, where the executable would only keep a reference to the function and look it up in a separate shared library file at runtime instead of containing the code itself.
