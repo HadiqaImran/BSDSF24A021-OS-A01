@@ -1,0 +1,20 @@
+.TH CLIENT 1 "September 2026" "libmyutils 1.0" "User Commands"
+.SH NAME
+client \- test driver program for the libmyutils utility library
+.SH SYNOPSIS
+.B client
+.SH DESCRIPTION
+.B client
+is a demonstration program that exercises the functions provided by
+.B libmyutils,
+a custom C utility library. It tests string manipulation functions
+(mystrlen, mystrcpy, mystrncpy, mystrcat) and file utility functions
+(wordCount, mygrep) by calling each one and printing the results to
+standard output.
+.PP
+The program expects a file named
+.I test.txt
+to be present in the current working directory, which it uses to
+demonstrate the file-handling functions.
+.SH AUTHOR
+Hadiqa Imran <bsdsf24a021@pucit.edu.pk>

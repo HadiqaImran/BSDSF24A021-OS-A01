@@ -39,3 +39,18 @@ clean:
 	rm -f $(OBJ_DIR)/*.o $(TARGET_STATIC) $(TARGET_DYNAMIC) $(LIBRARY_STATIC) $(LIBRARY_SHARED)
 
 .PHONY: all clean
+
+install: $(TARGET_STATIC)
+	install -d /usr/local/bin
+	install -m 755 $(TARGET_STATIC) /usr/local/bin/client
+	install -d /usr/local/share/man/man1
+	install -d /usr/local/share/man/man3
+	install -m 644 ../man/man1/client.1 /usr/local/share/man/man1/
+	install -m 644 ../man/man3/libmyutils.3 /usr/local/share/man/man3/
+
+uninstall:
+	rm -f /usr/local/bin/client
+	rm -f /usr/local/share/man/man1/client.1
+	rm -f /usr/local/share/man/man3/libmyutils.3
+
+.PHONY: install uninstall
