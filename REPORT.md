@@ -1,3 +1,11 @@
+# Programming Assignment 1 - Report
+
+**Name:** Hadiqa Imran
+**Roll Number:** BSDSF24A021
+**Repository:** https://github.com/HadiqaImran/BSDSF24A021-OS-A01
+
+This report documents my work building `libmyutils`, a C utility library, across multiple stages: a basic multi-file build, a static library, a dynamic library, and finally man pages with a system install target. Each section below answers the report questions for that feature.
+
 
 ## Feature 2: Multi-file Project using Make Utility
 
