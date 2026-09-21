@@ -26,3 +26,17 @@ ar is used to create and manage archive files, which in this context means bundl
 **Q3: When you run nm on client_static, are the symbols for functions like mystrlen present? What does this tell you?**
 
 Yes - running nm bin/client_static | grep mystrlen shows mystrlen listed with a T symbol type, meaning it's defined and present in the executable's actual code section. This confirms that static linking physically copies the machine code of every function it needs straight from the library into the final executable at link time. That's different from dynamic linking, where the executable would only keep a reference to the function and look it up in a separate shared library file at runtime instead of containing the code itself.
+
+## Feature 4: Creating and using Dynamic Library
+
+**Q1: What is Position-Independent Code (-fPIC) and why is it a fundamental requirement for creating shared libraries?**
+
+Position-Independent Code is machine code that doesn't assume it'll be loaded at one fixed memory address - it can run correctly no matter where in memory it actually ends up. This matters for shared libraries specifically because a .so file can get loaded into many different programs at once, and each of those programs might load it at a different memory address depending on what else is already using memory at that time. Without -fPIC, the code would have hardcoded assumptions about its own address that would break the moment it got loaded somewhere else. That's why I had to compile separate _pic.o versions of mystrfunctions.c and myfilefunctions.c specifically for the .so build, instead of reusing the regular object files from the static build.
+
+**Q2: Explain the difference in file size between your static and dynamic clients. Why does this difference exist?**
+
+In theory, a statically linked executable should be noticeably bigger than a dynamically linked one, because the static version physically copies all the library's code into the executable itself, while the dynamic version just keeps a reference to the shared library and loads its code at runtime instead. In my case the two ended up close in size since libmyutils is a really small library, so the overhead of the dynamic linking metadata roughly cancels out the space saved - but with a bigger library the difference would show up clearly, since every program using it statically would carry its own full copy of the code, while programs using it dynamically would all share the exact same one copy in memory.
+
+**Q3: What is the LD_LIBRARY_PATH environment variable? Why was it necessary, and what does this tell you about the loader's responsibilities?**
+
+LD_LIBRARY_PATH is an environment variable that tells the dynamic loader extra folders to search when looking for shared libraries at runtime, in addition to the default system locations like /lib and /usr/lib. I needed to set it because my custom libmyutils.so lives inside my own project folder, which isn't a location the loader checks by default - without it, client_dynamic failed immediately with a "cannot open shared object file" error, even though the program itself compiled and linked successfully. This shows that with dynamic linking, the linker's job at compile time is only to record that a dependency exists - it's the operating system's dynamic loader that's actually responsible for finding and loading the real library code at the moment the program runs, which is a completely separate step from linking.
